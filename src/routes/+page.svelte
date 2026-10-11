@@ -37,8 +37,7 @@
 	})
 </script>
 
-<div
-	class="relative min-h-dvh bg-[#F2F2EE] font-mono text-[#111] dark:bg-[#0A0A0A] dark:text-[#EAEAEA]">
+<div class="relative min-h-dvh font-mono">
 	<div class="scanlines pointer-events-none fixed inset-0"></div>
 
 	<main
