@@ -78,6 +78,7 @@ export default defineConfig({
 		bracketSameLine: true,
 		svelte: true,
 		sortTailwindcss: { stylesheet: './src/app.css' },
-		ignorePatterns: ['pnpm-lock.yaml']
+		// Generated, or installed from elsewhere by the skills CLI.
+		ignorePatterns: ['pnpm-lock.yaml', '.agents/', 'skills-lock.json']
 	}
 })

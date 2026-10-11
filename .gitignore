@@ -24,3 +24,8 @@ vite.config.ts.timestamp-*
 # Vitest: browser-mode failure screenshots (next to the test file) and annotation attachments
 __screenshots__
 .vitest
+
+# Agent skills installed by the skills CLI (skills-lock.json), not part of the repo
+/.agents/
+/.claude/skills/
+/skills-lock.json
