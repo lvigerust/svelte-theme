@@ -2,7 +2,7 @@ import { sveltekit } from '@sveltejs/kit/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
-import { rules } from './lint-rules.js'
+import { rules } from './.config/lint-rules.js'
 
 // src/lib is the package. The SvelteKit app in src/routes is a sandbox for local
 // development only; it is never built or deployed, so it has no adapter.

@@ -5,7 +5,7 @@ import prettier from 'eslint-config-prettier'
 import svelte from 'eslint-plugin-svelte'
 import globals from 'globals'
 import ts from 'typescript-eslint'
-import { rules } from './lint-rules.js'
+import { rules } from './.config/lint-rules.js'
 
 // Oxlint (`vp lint`) lints .ts/.js, including .svelte.ts modules. It reads only the script
 // block of a .svelte file and eslint-plugin-svelte's template rules don't run under it, so
