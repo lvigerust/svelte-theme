@@ -1,0 +1,60 @@
+name: Pages
+
+# Builds the prerendered sandbox (src/routes) and publishes it to GitHub Pages on every
+# push to main. Settings → Pages → Source must be "GitHub Actions".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer push replaces a queued one but never cancels a running one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the sandbox
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Node 24 and Vite+
+        uses: voidzero-dev/setup-vp@v1.21.2
+        with:
+          node-version: '24'
+          cache: true
+
+      - name: Read the Pages base path
+        id: pages
+        uses: actions/configure-pages@v6.0.0
+
+      # Pages serves the site under /<repo>, so every asset URL needs that prefix.
+      - name: Build to build/
+        run: vp build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Upload build/ for Pages
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: build/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1

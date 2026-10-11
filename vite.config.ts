@@ -7,8 +7,8 @@ import { rules } from './.config/lint-rules.js'
 
 // src/lib is the package. The SvelteKit app in src/routes is the sandbox, prerendered
 // (src/routes/+layout.ts) to static HTML in build/: `vp build && vp preview` locally, and
-// a static host serves the same folder. Static HTML has no server to read the theme, the
-// case the before-paint script exists for.
+// GitHub Pages serves the same folder (.github/workflows/pages.yml). Static HTML has no
+// server to read the theme, the case the before-paint script exists for.
 
 export default defineConfig({
 	// Only `vp dev`/`vp test` need the plugins; `vp check` skips loading them.
@@ -16,6 +16,9 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit({
 			adapter: adapter(),
+			// Pages serves the sandbox under /svelte-theme; its workflow sets BASE_PATH. Locally
+			// it stays at the root.
+			paths: { base: (process.env.BASE_PATH ?? '') as '' | `/${string}` },
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: ({ filename }) =>
