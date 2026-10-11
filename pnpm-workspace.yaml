@@ -1,2 +1,22 @@
 allowBuilds:
   esbuild: true
+
+engineStrict: true
+
+# Toolchain versions that move together with vite-plus (`vp migrate` keeps vite and
+# vite-plus in step; bump the Vitest pair with them).
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  vite-plus: 1.1.0
+  # The Vitest that vite-plus bundles (`vp toolchain`): a second copy would split
+  # `expect` and runner state with `vp test`.
+  vitest: 5.0.3
+  '@vitest/browser-playwright': 5.0.3
+overrides:
+  vite@*: 'catalog:'
+  vitest@*: 'catalog:'
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: '*'

@@ -1,20 +1,76 @@
-import adapter from '@sveltejs/adapter-auto';
-import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { sveltekit } from '@sveltejs/kit/vite'
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig, lazyPlugins } from 'vite-plus'
+import { playwright } from 'vite-plus/test/browser-playwright'
+import { rules } from './lint-rules.js'
+
+// src/lib is the package. The SvelteKit app in src/routes is a sandbox for local
+// development only; it is never built or deployed, so it has no adapter.
 
 export default defineConfig({
-	plugins: [
+	// Only `vp dev`/`vp test` need the plugins; `vp check` skips loading them.
+	plugins: lazyPlugins(() => [
+		tailwindcss(),
 		sveltekit({
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
-			},
-
-			// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-			// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-			// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-			adapter: adapter()
+			}
 		})
-	]
-});
+	]),
+	test: {
+		expect: { requireAssertions: true },
+		projects: [
+			{
+				extends: true,
+				test: {
+					name: 'client',
+					browser: {
+						enabled: true,
+						provider: playwright(),
+						headless: true,
+						instances: [{ browser: 'chromium' }]
+					},
+					include: ['src/**/*.svelte.{test,spec}.{js,ts}']
+				}
+			},
+			{
+				extends: true,
+				test: {
+					name: 'server',
+					environment: 'node',
+					include: ['src/**/*.{test,spec}.{js,ts}'],
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+				}
+			}
+		]
+	},
+	staged: {
+		// ESLint first so oxlint and the formatter have the last word.
+		'*': ['eslint --fix --no-warn-ignored', 'vp check --fix']
+	},
+	// Oxlint lints .ts/.js (including .svelte.ts modules); ESLint lints .svelte files
+	// (eslint.config.js). Type checking stays with svelte-check (`vp run check`).
+	lint: {
+		plugins: ['typescript', 'unicorn', 'oxc'],
+		jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
+		ignorePatterns: ['**/*.svelte'],
+		rules: {
+			...rules,
+			'vite-plus/prefer-vite-plus-imports': 'error'
+		},
+		options: { typeAware: true }
+	},
+	fmt: {
+		semi: false,
+		useTabs: true,
+		singleQuote: true,
+		trailingComma: 'none',
+		printWidth: 100,
+		bracketSameLine: true,
+		svelte: true,
+		sortTailwindcss: { stylesheet: './src/app.css' },
+		ignorePatterns: ['pnpm-lock.yaml']
+	}
+})
