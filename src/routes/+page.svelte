@@ -42,15 +42,15 @@
 	<div class="scanlines pointer-events-none fixed inset-0"></div>
 
 	<main
-		class="relative mx-auto flex max-w-3xl flex-col gap-10 px-6 pt-20 pb-24 text-[13px] leading-[1.5]">
+		class="relative mx-auto flex max-w-5xl flex-col gap-14 px-8 pt-28 pb-32 text-xl leading-[1.5]">
 		<header
-			class="flex justify-between gap-4 border-b border-black/15 pb-3 text-xs dark:border-white/15">
+			class="flex justify-between gap-4 border-b border-black/15 pb-4 text-base dark:border-white/15">
 			<h1>[ @lvigerust/svelte-theme ]</h1>
 			<span class="tracking-[0.08em] uppercase opacity-60">tty</span>
 		</header>
 
-		<div class="grid gap-x-10 gap-y-8 md:grid-cols-[auto_1fr]">
-			<dl class="grid grid-cols-[7rem_7ch] content-start gap-y-2 tracking-[0.06em] uppercase">
+		<div class="grid gap-x-16 gap-y-12 md:grid-cols-[auto_1fr]">
+			<dl class="grid grid-cols-[11rem_7ch] content-start gap-y-3 tracking-[0.06em] uppercase">
 				<dt class="opacity-60">&gt; override</dt>
 				<dd
 					class:opacity-0={!sandbox.hydrated}
@@ -71,11 +71,11 @@
 
 			<!-- Native radios: one Tab stop for the group, and the arrow keys move and set the override. -->
 			<fieldset class="tracking-[0.06em] uppercase">
-				<legend class="mb-2 opacity-60">set override</legend>
-				<div class="flex flex-wrap gap-1">
+				<legend class="mb-3 opacity-60">set override</legend>
+				<div class="flex flex-wrap gap-2">
 					{#each themes as value (value)}
 						<label
-							class="cursor-pointer px-1.5 py-0.5 select-none has-checked:bg-[#111] has-checked:text-[#F2F2EE] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-[#E61919] dark:has-checked:bg-[#EAEAEA] dark:has-checked:text-[#0A0A0A] dark:has-focus-visible:outline-[#FF2A2A]">
+							class="cursor-pointer px-2.5 py-1 select-none has-checked:bg-[#111] has-checked:text-[#F2F2EE] has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-[#E61919] dark:has-checked:bg-[#EAEAEA] dark:has-checked:text-[#0A0A0A] dark:has-focus-visible:outline-[#FF2A2A]">
 							<input
 								class="sr-only"
 								type="radio"
@@ -91,12 +91,12 @@
 		</div>
 
 		<ol
-			class="flex min-h-[15.5rem] flex-col border border-black/15 p-4 dark:border-white/15"
+			class="flex min-h-[24rem] flex-col border border-black/15 p-6 dark:border-white/15"
 			aria-live="polite">
 			{#each lines as line, i (line.id)}
-				<li class="flex gap-4">
+				<li class="flex gap-6">
 					<span class="opacity-40">{line.time}</span>
-					<span class="w-12 text-[#E61919] dark:text-[#FF2A2A]">{line.tag}</span>
+					<span class="w-18 text-[#E61919] dark:text-[#FF2A2A]">{line.tag}</span>
 					<span {@attach type}>{line.text}</span>
 					{#if i === lines.length - 1}
 						<span
@@ -108,7 +108,7 @@
 			{/each}
 		</ol>
 
-		<p class="max-w-[64ch] border-l-2 border-[#E61919] pl-4 opacity-70 dark:border-[#FF2A2A]">
+		<p class="max-w-[64ch] border-l-4 border-[#E61919] pl-6 opacity-70 dark:border-[#FF2A2A]">
 			Flip the switch, or change the OS setting with override on system, and watch each step land.
 			The page should never flash the other theme on reload.
 		</p>
