@@ -30,7 +30,12 @@ export default defineConfig({
 						enabled: true,
 						provider: playwright(),
 						headless: true,
-						instances: [{ browser: 'chromium' }]
+						instances: [{ browser: 'chromium' }],
+						commands: {
+							/** Sets `prefers-color-scheme` for the page under test. */
+							emulateColorScheme: ({ page }, colorScheme: 'light' | 'dark') =>
+								page.emulateMedia({ colorScheme })
+						}
 					},
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}']
 				}
