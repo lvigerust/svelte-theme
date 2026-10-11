@@ -50,7 +50,7 @@
 		</header>
 
 		<div class="grid gap-x-10 gap-y-8 md:grid-cols-[auto_1fr]">
-			<dl class="grid grid-cols-[7rem_1fr] content-start gap-y-2 tracking-[0.06em] uppercase">
+			<dl class="grid grid-cols-[7rem_7ch] content-start gap-y-2 tracking-[0.06em] uppercase">
 				<dt class="opacity-60">&gt; override</dt>
 				<dd
 					class:opacity-0={!sandbox.hydrated}
