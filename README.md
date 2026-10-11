@@ -98,6 +98,7 @@ Requires Node 22.22.1+ and [Vite+](https://viteplus.dev) (`vp`). pnpm is pinned 
 ```sh
 vp install            # also installs the pre-commit hook
 vp dev                # sandbox app in src/routes (never deployed)
+vp build && vp preview  # the sandbox prerendered, as static HTML with no server to read the theme
 vp run ready          # what CI runs: format, oxlint, ESLint, svelte-check, tests
 ```
 

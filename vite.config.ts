@@ -5,7 +5,9 @@ import { playwright } from 'vite-plus/test/browser-playwright'
 import { rules } from './.config/lint-rules.js'
 
 // src/lib is the package. The SvelteKit app in src/routes is a sandbox for local
-// development only; it is never built or deployed, so it has no adapter.
+// development only; it is never deployed, so it has no adapter. It is prerendered
+// (src/routes/+layout.ts): `vp build && vp preview` serves it as static HTML, the
+// case the before-paint script exists for, and the build warns that no adapter is set.
 
 export default defineConfig({
 	// Only `vp dev`/`vp test` need the plugins; `vp check` skips loading them.
