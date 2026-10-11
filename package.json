@@ -1,15 +1,19 @@
 {
-	"name": "svelte-theme",
-	"version": "0.0.1",
+	"name": "@lvigerust/svelte-theme",
+	"version": "0.1.0",
+	"description": "Light/dark theme state for Svelte 5: sets the .dark class on <html>, before paint and after",
+	"license": "UNLICENSED",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lvigerust/svelte-theme.git"
+	},
 	"files": [
 		"dist",
 		"!dist/**/*.test.*",
 		"!dist/**/*.spec.*"
 	],
 	"type": "module",
-	"sideEffects": [
-		"**/*.css"
-	],
+	"sideEffects": false,
 	"types": "./dist/index.d.ts",
 	"svelte": "./dist/index.js",
 	"imports": {
@@ -21,6 +25,9 @@
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
 		}
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com"
 	},
 	"scripts": {
 		"prepare": "vp config && svelte-kit sync || echo ''",
