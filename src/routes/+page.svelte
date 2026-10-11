@@ -35,6 +35,14 @@
 		}
 		previous = state
 	})
+
+	// Focus the active override once hydrated, so the arrow keys work without a Tab first. The
+	// override is untracked: this runs on load only, not on every change.
+	const focusOnLoad = (value: ThemeOverride) => (input: HTMLInputElement) => {
+		if (sandbox.hydrated && untrack(() => theme.override) === value) {
+			input.focus({ focusVisible: true })
+		}
+	}
 </script>
 
 <div class="relative min-h-dvh font-mono">
@@ -81,7 +89,8 @@
 								name="override"
 								{value}
 								checked={sandbox.hydrated && theme.override === value}
-								onchange={() => (theme.override = value)} />
+								onchange={() => (theme.override = value)}
+								{@attach focusOnLoad(value)} />
 							<span aria-hidden="true">[&nbsp;</span>{value}<span aria-hidden="true">&nbsp;]</span>
 						</label>
 					{/each}
