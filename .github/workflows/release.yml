@@ -1,0 +1,47 @@
+name: Release
+
+# Pushing a tag vX.Y.Z publishes that version to GitHub Packages. The tag must match
+# package.json's version; see docs/adr/0002-release-by-pushing-a-version-tag.md.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release
+      packages: write # publish to GitHub Packages
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: voidzero-dev/setup-vp@v1.21.2
+        with:
+          node-version: '24'
+          cache: true
+          registry-url: https://npm.pkg.github.com
+
+      - name: Check the tag matches package.json
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match package.json version $version"
+            exit 1
+          fi
+
+      # prepack builds dist/ and runs publint. A tag checkout is a detached HEAD, which
+      # pnpm's branch check would reject.
+      - run: vp pm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

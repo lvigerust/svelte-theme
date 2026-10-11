@@ -1,79 +1,111 @@
-# Svelte library
+# @lvigerust/svelte-theme
 
-Everything you need to build a Svelte library, powered by [`sv`](https://npmjs.com/package/sv).
+Light/dark theme state for Svelte 5. Remembers the user's choice, follows the OS when there isn't one, syncs across tabs, and sets a `dark` class on `<html>`, before first paint and after.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Install
 
-## Creating a project
+The package is on GitHub Packages. Point the `@lvigerust` scope at it in your `.npmrc`, with a GitHub token that has `read:packages`:
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+```ini
+@lvigerust:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
-To recreate this project with the same configuration:
-
 ```sh
-# recreate this project
-pnpm dlx sv@1.0.0-next.8 create --template library --types ts --add prettier eslint experimental="features:none" --install pnpm svelte-theme
+pnpm add @lvigerust/svelte-theme
 ```
 
-## Adding features
+## Usage
 
-Add features to your project with `sv add`:
+Render `<Theme />` once, in the root layout. It owns the `dark` class on `<html>`.
 
-```sh
-npx sv add
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script>
+	import { Theme } from '@lvigerust/svelte-theme'
+
+	let { children } = $props()
+</script>
+
+<Theme />
+
+{@render children()}
 ```
 
-For example, to add Tailwind CSS:
+Read and set the theme anywhere through `theme`:
 
-```sh
-npx sv add tailwindcss
+```svelte
+<script>
+	import { theme, themes } from '@lvigerust/svelte-theme'
+</script>
+
+{#each themes as value (value)}
+	<button aria-pressed={theme.override === value} onclick={() => (theme.override = value)}>
+		{value}
+	</button>
+{/each}
+
+<p>Showing {theme.current}</p>
 ```
 
-## Developing
+## API
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### `theme`
 
-```sh
-npm run dev
+| Property   | Type                            | Description                                                                                                          |
+| ---------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `override` | `'light' \| 'dark' \| 'system'` | The user's choice. Settable; persisted to `localStorage` (key `theme`) and synced across tabs. `'system'` clears it. |
+| `system`   | `'light' \| 'dark'`             | The OS color scheme, from `prefers-color-scheme`.                                                                    |
+| `current`  | `'light' \| 'dark'`             | What the page shows: `override`, or `system` while `override` is `'system'`.                                         |
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+All three are reactive. On the server, `override` is `'system'` and `system` is `'light'`, since neither the stored choice nor the OS setting is known there.
+
+### `themes`
+
+`['light', 'dark', 'system']`: the values `theme.override` accepts, in display order.
+
+### Types
+
+- `ThemeOverride`: `'light' | 'dark' | 'system'`
+- `ColorScheme`: `'light' | 'dark'`
+
+### `<Theme />`
+
+Takes no props. During server rendering it puts an inline script in `<head>` that sets the class from `localStorage` and `prefers-color-scheme` before the page paints, so a reload never flashes the other theme. After hydration it keeps the class in step with `theme.current`.
+
+The inline script needs a Content Security Policy that allows it (for example `'unsafe-inline'` or a hash of the script) if your app sets one.
+
+## The `.dark` contract
+
+`<html>` has the `dark` class exactly while `theme.current` is `'dark'`. This class is the package's public output. Stylesheets decide what `.dark` means. `@lvigerust/components/styles` switches its tokens and its Tailwind `dark` variant on it, so changing the class name or element is a breaking change.
+
+A Tailwind app that doesn't import `@lvigerust/components/styles` needs the same variant itself:
+
+```css
+@custom-variant dark (&:where(.dark, .dark *));
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+## Upgrading from 0.0.x
 
-## Building
+- The `Theme` type is now `ThemeOverride`. In 0.0.x the `Theme` component's type shadowed it, so `import type { Theme }` never gave you the union.
+- `theme.current` and `theme.system` are typed `ColorScheme`, without `'system'`.
+- `<Theme />` now owns the `dark` class. In 0.0.x the class only updated while something read `theme` inside an effect. Make sure `<Theme />` is rendered in the root layout.
 
-To build your library:
+## Development
 
-```sh
-npm pack
-```
-
-To create a production version of your showcase app:
+Requires Node 22.22.1+ and [Vite+](https://viteplus.dev) (`vp`). pnpm is pinned in `package.json`.
 
 ```sh
-npm run build
+vp install            # also installs the pre-commit hook
+vp dev                # sandbox app in src/routes (never deployed)
+vp run ready          # what CI runs: format, oxlint, ESLint, svelte-check, tests
 ```
 
-You can preview the production build with `npm run preview`.
+`src/lib` is the package. Tests live in `src/tests`: browser-mode tests (`*.svelte.test.ts`, Chromium via Playwright; run `vp exec playwright install chromium` once) and a packaging test that packs and installs the real tarball.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Releasing
 
-## Publishing
+1. Set `version` in `package.json` and commit it to `main`.
+2. Tag the commit and push the tag: `git tag v0.1.0 && git push origin v0.1.0`.
 
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```sh
-npm publish
-```
+The Release workflow runs CI, publishes to GitHub Packages and creates a GitHub release with generated notes ([ADR-0002](docs/adr/0002-release-by-pushing-a-version-tag.md)).
