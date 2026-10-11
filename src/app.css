@@ -1,1 +1,10 @@
 @import 'tailwindcss';
+
+/* The .dark contract, as an app without @lvigerust/components/styles declares it. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+	html {
+		@apply bg-white text-zinc-950 antialiased dark:bg-zinc-900 dark:text-white;
+	}
+}
