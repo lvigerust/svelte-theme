@@ -11,18 +11,22 @@ permissions:
 
 jobs:
   ci:
+    name: CI
     uses: ./.github/workflows/ci.yml
 
   publish:
+    name: Publish ${{ github.ref_name }}
     needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
       packages: write # publish to GitHub Packages
     steps:
-      - uses: actions/checkout@v7.0.1
+      - name: Check out the tag
+        uses: actions/checkout@v7.0.1
 
-      - uses: voidzero-dev/setup-vp@v1.21.2
+      - name: Set up Node 24 and Vite+ for GitHub Packages
+        uses: voidzero-dev/setup-vp@v1.21.2
         with:
           node-version: '24'
           cache: true
@@ -38,10 +42,12 @@ jobs:
 
       # prepack builds dist/ and runs publint. A tag checkout is a detached HEAD, which
       # pnpm's branch check would reject.
-      - run: vp pm publish --no-git-checks
+      - name: Publish to GitHub Packages
+        run: vp pm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
+      - name: Create the GitHub release
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}

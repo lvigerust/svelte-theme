@@ -12,16 +12,22 @@ permissions:
 
 jobs:
   ready:
+    name: Format, lint, type-check and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.1
+      - name: Check out the repo
+        uses: actions/checkout@v7.0.1
 
-      - uses: voidzero-dev/setup-vp@v1.21.2
+      - name: Set up Node 24 and Vite+
+        uses: voidzero-dev/setup-vp@v1.21.2
         with:
           node-version: '24'
           cache: true
 
       # The browser tests run in Chromium through Playwright.
-      - run: vp exec playwright install --with-deps chromium
+      - name: Install Chromium for the browser tests
+        run: vp exec playwright install --with-deps chromium
 
-      - run: vp run ready
+      # The same gate as locally: vp check, ESLint, svelte-check, then the tests.
+      - name: Run the ready gate
+        run: vp run ready
