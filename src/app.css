@@ -8,3 +8,8 @@
 		@apply bg-white text-zinc-950 antialiased dark:bg-zinc-900 dark:text-white;
 	}
 }
+
+/* The sandbox page's font; +page.svelte imports its @fontsource files. */
+@theme {
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
