@@ -97,10 +97,12 @@ Requires Node 22.22.1+ and [Vite+](https://viteplus.dev) (`vp`). pnpm is pinned 
 
 ```sh
 vp install            # also installs the pre-commit hook
-vp dev                # sandbox app in src/routes (never deployed)
-vp build && vp preview  # the sandbox prerendered, as static HTML with no server to read the theme
-vp run ready          # what CI runs: format, oxlint, ESLint, svelte-check, tests
+vp dev                  # sandbox app in src/routes
+vp build && vp preview  # the sandbox prerendered to build/, as a static host serves it
+vp run ready            # what CI runs: format, oxlint, ESLint, svelte-check, tests
 ```
+
+The sandbox is static HTML with no server to read the theme, the case the before-paint script exists for. It is hosted on Cloudflare Workers as static assets (`wrangler.jsonc`): Workers Builds runs `pnpm build`, then `pnpm dlx wrangler@4 deploy`, on every push to `main`.
 
 `src/lib` is the package. Tests live in `src/tests`: browser-mode tests (`*.svelte.test.ts`, Chromium via Playwright; run `vp exec playwright install chromium` once) and a packaging test that packs and installs the real tarball.
 

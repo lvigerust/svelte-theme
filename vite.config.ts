@@ -1,19 +1,21 @@
+import adapter from '@sveltejs/adapter-static'
 import { sveltekit } from '@sveltejs/kit/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
 import { rules } from './.config/lint-rules.js'
 
-// src/lib is the package. The SvelteKit app in src/routes is a sandbox for local
-// development only; it is never deployed, so it has no adapter. It is prerendered
-// (src/routes/+layout.ts): `vp build && vp preview` serves it as static HTML, the
-// case the before-paint script exists for, and the build warns that no adapter is set.
+// src/lib is the package. The SvelteKit app in src/routes is the sandbox, prerendered
+// (src/routes/+layout.ts) to static HTML in build/: `vp build && vp preview` locally, and
+// a static host serves the same folder. Static HTML has no server to read the theme, the
+// case the before-paint script exists for.
 
 export default defineConfig({
 	// Only `vp dev`/`vp test` need the plugins; `vp check` skips loading them.
 	plugins: lazyPlugins(() => [
 		tailwindcss(),
 		sveltekit({
+			adapter: adapter(),
 			compilerOptions: {
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: ({ filename }) =>
